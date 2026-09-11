@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>구글 시트 연동 모바일 영단어 퀴즈</title>
+    <!-- Tailwind CSS for modern, mobile-first UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .card-flip { perspective: 1000px; }
+        .card-inner { transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .card-flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { backface-visibility: hidden; }
+        .card-back { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-blue-100 min-h-screen text-slate-800 flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <header class="w-full bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-md mx-auto px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-emerald-600 text-white p-2 rounded-xl shadow-md shadow-emerald-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-800 leading-tight">모바일 영단어 퀴즈</h1>
+                    <p class="text-[11px] text-emerald-600 font-medium" id="db-status-text">구글 시트 연동 대기중...</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-1.5">
+                <button onclick="openShareModal()" class="p-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition" title="공유 및 모바일 접속">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                </button>
+                <button onclick="openConfigModal()" class="p-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition" title="시트 설정">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-md w-full mx-auto px-4 py-6 flex flex-col justify-center items-center">
+
+        <!-- Loading Screen -->
+        <div id="loading-view" class="w-full flex flex-col items-center justify-center py-12 space-y-4 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-emerald-600 border-t-transparent"></div>
+            <p class="text-slate-700 font-semibold text-sm">구글 시트 단어장을 불러오는 중...</p>
+            <p class="text-xs text-slate-400 max-w-xs">잠시만 기다리시면 실시간 단어장이 연동됩니다.</p>
+            <div class="flex flex-col w-full space-y-2 pt-4">
+                <button onclick="loadSampleData()" class="w-full py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium rounded-2xl transition text-sm shadow-sm">샘플로 먼저 체험하기</button>
+                <button onclick="openConfigModal()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-2xl shadow-lg shadow-emerald-200 transition text-sm">구글 시트 URL 연결하기</button>
+            </div>
+        </div>
+
+        <!-- Quiz Interface -->
+        <div id="quiz-view" class="w-full hidden flex flex-col space-y-5">
+            <!-- Progress & Stats Bar -->
+            <div class="w-full flex justify-between items-center bg-white px-4 py-3 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">진행도</span>
+                    <span id="progress-text" class="text-sm font-bold text-slate-700">1 / 10</span>
+                </div>
+                <button onclick="fetchSheetData()" class="text-xs text-emerald-600 hover:underline flex items-center space-x-1 font-medium bg-emerald-50/50 px-2 py-1 rounded-lg">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span>새로고침</span>
+                </button>
+            </div>
+
+            <!-- Flashcard Container (Optimized for touch taps) -->
+            <div id="flashcard" class="w-full h-72 card-flip cursor-pointer select-none" onclick="toggleCard()">
+                <div class="card-inner w-full h-full relative rounded-3xl shadow-xl bg-white border border-slate-100">
+                    <!-- Front (Meaning Only) -->
+                    <div class="card-front absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-white to-slate-50/80 rounded-3xl">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">뜻 (Meaning)</span>
+                        <h2 id="card-meaning" class="text-2xl font-bold text-slate-800 tracking-tight leading-snug">뜻을 불러오는 중...</h2>
+                        <div class="absolute bottom-5 flex items-center space-x-1.5 text-xs text-emerald-600 font-medium bg-emerald-50 px-3 py-1.5 rounded-full shadow-sm">
+                            <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                            <span>화면을 터치해 단어 확인</span>
+                        </div>
+                    </div>
+                    <!-- Back (English Word & Reveal) -->
+                    <div class="card-back absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 text-center bg-emerald-600 text-white rounded-3xl shadow-inner">
+                        <span class="text-[11px] font-bold text-emerald-200 uppercase tracking-widest mb-1">영단어 (English Word)</span>
+                        <h2 id="card-word" class="text-3xl font-extrabold tracking-tight mb-2">Word</h2>
+                        <p id="card-sub-meaning" class="text-xs text-emerald-100 opacity-90 px-4"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Controls (Large touch targets for mobile) -->
+            <div class="w-full grid grid-cols-2 gap-3">
+                <button onclick="handleAnswer(false)" class="py-3.5 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-slate-700 hover:text-rose-600 font-semibold rounded-2xl shadow-sm transition flex items-center justify-center space-x-2 text-sm active:scale-95">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span>몰랐어요</span>
+                </button>
+                <button onclick="handleAnswer(true)" class="py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-200 transition flex items-center justify-center space-x-2 text-sm active:scale-95">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>알고 있었어요</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Completion View -->
+        <div id="complete-view" class="w-full hidden flex flex-col items-center justify-center py-8 text-center space-y-5 bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
+            <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl shadow-inner">🎉</div>
+            <h2 class="text-xl font-bold text-slate-800">퀴즈를 모두 완료했습니다!</h2>
+            <p class="text-slate-500 text-xs max-w-xs leading-relaxed">구글 시트에 단어를 추가하거나 수정하면 언제든지 새로운 단어로 바로 퀴즈를 풀 수 있습니다.</p>
+            <div class="flex flex-col space-y-2.5 w-full pt-2">
+                <button onclick="restartQuiz()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition text-sm">랜덤으로 다시 풀기</button>
+                <button onclick="openShareModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition text-sm">모바일 링크 공유하기</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Config Modal -->
+    <div id="config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="bg-white max-w-md w-full rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800">구글 시트 연동 설정</h3>
+                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-3.5 space-y-2 text-[11px] text-emerald-900">
+                <p class="font-bold text-emerald-800 text-xs">💡 3분 구글 시트 연동 방법</p>
+                <ol class="list-decimal list-inside space-y-1 text-slate-700 leading-normal">
+                    <li>시트 1행에 <code class="bg-white px-1 py-0.5 rounded border border-emerald-200 font-bold">word</code>, <code class="bg-white px-1 py-0.5 rounded border border-emerald-200 font-bold">meaning</code> 입력</li>
+                    <li>상단 메뉴 <b>[확장 프로그램] > [Apps Script]</b> 클릭</li>
+                    <li>아래 소스코드 붙여넣고 저장(💾)하기</li>
+                </ol>
+                <div class="relative bg-slate-900 text-emerald-400 p-2.5 rounded-xl font-mono text-[10px] overflow-x-auto">
+<pre>function doGet() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var rows = sheet.getDataRange().getValues();
+  var data = [];
+  for (var i = 1; i < rows.length; i++) {
+    var row = rows[i];
+    if(row[0]) {
+      data.push({ word: String(row[0]), meaning: String(row[1]) });
+    }
+  }
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+                </div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-700 pt-1">
+                    <li>우측 상단 <b>[배포] > [새 배포]</b> 클릭</li>
+                    <li>유형: <b>웹 앱</b> / 액세스: <b>모든 사용자(Anyone)</b> 설정 후 배포</li>
+                    <li>발급된 <b>웹 앱 URL(/exec)</b> 아래에 입력 후 저장!</li>
+                </ol>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">구글 Apps Script 웹 앱 URL (/exec)</label>
+                <input type="text" id="sheet-url-input" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+
+            <div class="flex space-x-2 pt-2">
+                <button onclick="loadSampleData()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">샘플로 체험</button>
+                <button onclick="saveAndReload()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl text-xs shadow-md transition">저장 및 연동</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="share-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="bg-white max-w-md w-full rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-bold text-slate-800">모바일에서 바로 이용하기</h3>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                이 사이트를 스마트폰 브라우저(카카오톡, 사파리, 크롬)로 열어 언제 어디서나 영단어 퀴즈를 풀 수 있습니다. 아래 주소를 복사하여 스마트폰으로 공유해 보세요!
+            </p>
+            <div class="flex items-center space-x-2">
+                <input type="text" id="current-url-input" readonly class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 font-mono" />
+                <button onclick="copyCurrentUrl()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-xl transition whitespace-nowrap shadow-sm">주소 복사</button>
+            </div>
+            <div class="pt-2">
+                <button onclick="closeShareModal()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white max-w-xs w-full rounded-2xl p-5 shadow-2xl text-center space-y-3">
+            <h3 id="alert-title" class="text-base font-bold text-slate-800">알림</h3>
+            <p id="alert-message" class="text-xs text-slate-600 leading-relaxed"></p>
+            <button onclick="closeAlert()" class="w-full py-2.5 bg-emerald-600 text-white font-medium rounded-xl text-xs shadow-md">확인</button>
+        </div>
+    </div>
+
+    <footer class="text-center py-4 text-[11px] text-slate-400">
+        Mobile Google Sheets Vocab Quiz &copy; 2026
+    </footer>
+
+    <script>
+        let vocabList = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let pollInterval = null;
+
+        const sampleVocab = [
+            { word: "Proper", meaning: "적당한, 알맞은" },
+            { word: "Apple", meaning: "사과" },
+            { word: "Serendipity", meaning: "뜻밖의 행운" },
+            { word: "Resilient", meaning: "회복력 있는" }
+        ];
+
+        function showAlert(title, message) {
+            document.getElementById('alert-title').innerText = title;
+            document.getElementById('alert-message').innerText = message;
+            document.getElementById('alert-modal').classList.remove('hidden');
+        }
+
+        function closeAlert() {
+            document.getElementById('alert-modal').classList.add('hidden');
+        }
+
+        function openConfigModal() {
+            document.getElementById('config-modal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+        }
+
+        function openShareModal() {
+            document.getElementById('current-url-input').value = window.location.href;
+            document.getElementById('share-modal').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-modal').classList.add('hidden');
+        }
+
+        function copyCurrentUrl() {
+            const input = document.getElementById('current-url-input');
+            input.select();
+            document.execCommand('copy');
+            showAlert("복사 완료", "퀴즈 사이트 주소가 복사되었습니다.\n스마트폰 카카오톡이나 메시지에 붙여넣어 접속하세요!");
+        }
+
+        function loadSampleData() {
+            vocabList = [...sampleVocab];
+            shuffleArray(vocabList);
+            currentIndex = 0;
+            closeConfigModal();
+            showQuizView();
+            updateCard();
+            document.getElementById('db-status-text').innerText = "샘플 단어장 연동됨";
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function showQuizView() {
+            document.getElementById('loading-view').classList.add('hidden');
+            document.getElementById('complete-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
+        }
+
+        function showCompleteView() {
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('complete-view').classList.remove('hidden');
+        }
+
+        function toggleCard() {
+            const flashcard = document.getElementById('flashcard');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                flashcard.classList.add('card-flipped');
+            } else {
+                flashcard.classList.remove('card-flipped');
+            }
+        }
+
+        function updateCard() {
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('card-flipped');
+
+            if (currentIndex >= vocabList.length) {
+                showCompleteView();
+                return;
+            }
+
+            const currentItem = vocabList[currentIndex];
+            document.getElementById('card-meaning').innerText = currentItem.meaning;
+            document.getElementById('card-word').innerText = currentItem.word;
+            document.getElementById('card-sub-meaning').innerText = currentItem.meaning;
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${vocabList.length}`;
+        }
+
+        function handleAnswer(known) {
+            currentIndex++;
+            updateCard();
+        }
+
+        function restartQuiz() {
+            shuffleArray(vocabList);
+            currentIndex = 0;
+            showQuizView();
+            updateCard();
+        }
+
+        async function fetchSheetData() {
+            const sheetUrl = document.getElementById('sheet-url-input').value.trim();
+            if (!sheetUrl) {
+                loadSampleData();
+                return;
+            }
+
+            document.getElementById('db-status-text').innerText = "구글 시트 동기화 중...";
+
+            try {
+                const response = await fetch(sheetUrl);
+                if (!response.ok) throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
+                const data = await response.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    throw new Error("시트에 단어 데이터가 없거나 형식이 올바르지 않습니다.");
+                }
+
+                vocabList = data;
+                shuffleArray(vocabList);
+                currentIndex = 0;
+                document.getElementById('db-status-text').innerText = "실시간 구글 시트 연동 ✨";
+                showQuizView();
+                updateCard();
+            } catch (err) {
+                console.warn("Sheet fetch error:", err);
+                document.getElementById('db-status-text').innerText = "연동 오류 (샘플 전환)";
+                if (vocabList.length === 0) {
+                    loadSampleData();
+                }
+                showAlert("연동 안내", "구글 시트 웹 앱 URL이 올바른지 확인해주세요.\n\n[체크사항]\n1. Apps Script 배포 시 '새 버전(New Version)'을 선택하셨나요?\n2. 액세스 권한이 '모든 사용자(Anyone)'로 되어 있나요?\n3. URL이 '/exec'로 끝나나요?");
+            }
+        }
+
+        function saveAndReload() {
+            const url = document.getElementById('sheet-url-input').value.trim();
+            localStorage.setItem('sheet_api_url', url);
+            closeConfigModal();
+            fetchSheetData();
+        }
+
+        window.onload = function() {
+            const savedUrl = localStorage.getItem('sheet_api_url');
+            if (savedUrl) {
+                document.getElementById('sheet-url-input').value = savedUrl;
+                fetchSheetData();
+            } else {
+                loadSampleData();
+            }
+
+            // Real-time polling every 10 seconds to auto-sync sheet updates
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(() => {
+                const url = document.getElementById('sheet-url-input').value.trim();
+                if (url) {
+                    fetchSheetData();
+                }
+            }, 10000);
+        };
+    </script>
+</body>
+</html>
