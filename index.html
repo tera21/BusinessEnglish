@@ -317,11 +317,20 @@
             document.getElementById('db-status-text').innerText = "구글 시트 동기화 중...";
 
             try {
-                // Add a cache-busting timestamp to prevent browser caching of sheet responses
+                // iOS Safari aggressively caches fetch API requests. 
+                // We add multiple unique query parameters and no-cache headers to bypass Safari cache.
                 const separator = sheetUrl.includes('?') ? '&' : '?';
-                const noCacheUrl = `${sheetUrl}${separator}_t=${new Date().getTime()}`;
+                const antiCacheUrl = `${sheetUrl}${separator}_cb=${new Date().getTime()}&_rand=${Math.random()}`;
 
-                const response = await fetch(noCacheUrl);
+                const response = await fetch(antiCacheUrl, {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+
                 if (!response.ok) throw new Error(`HTTP 오류! 상태 코드: ${response.status}`);
                 const data = await response.json();
 
@@ -360,7 +369,7 @@
                 loadSampleData();
             }
 
-            // Real-time auto-sync polling every 10 seconds (fetches new rows instantly without redeploy)
+            // Real-time auto-sync polling every 10 seconds
             if (pollInterval) clearInterval(pollInterval);
             pollInterval = setInterval(() => {
                 const url = document.getElementById('sheet-url-input').value.trim();
