@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
-        .card-container { perspective: 1000px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        /* 카드 사이즈가 찌그러지지 않도록 고정 높이와 입체 효과 부여 */
+        .card-container { perspective: 1000px; cursor: pointer; -webkit-tap-highlight-color: transparent; height: 380px; flex-shrink: 0; }
         .card-inner { transition: transform 0.4s ease-in-out; transform-style: preserve-3d; width: 100%; height: 100%; position: relative; }
         .card-front, .card-back { backface-visibility: hidden; position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card-back { transform: rotateY(180deg); background-color: #059669; color: white; }
@@ -36,7 +37,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col p-4 max-w-lg mx-auto w-full">
+    <main class="flex-1 flex flex-col justify-between p-4 max-w-lg mx-auto w-full">
         <!-- Progress Bar -->
         <div class="bg-white rounded-2xl p-4 flex justify-between items-center shadow-sm mb-4">
             <div class="flex items-center gap-2">
@@ -49,7 +50,7 @@
         </div>
 
         <!-- Flashcard -->
-        <div class="flex-1 flex flex-col justify-center mb-6 card-container h-80" onclick="toggleCard()">
+        <div class="card-container my-auto" onclick="toggleCard()">
             <div id="cardInner" class="card-inner">
                 
                 <!-- 뜻 (앞면) -->
@@ -71,7 +72,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-3 mt-auto">
+        <div class="flex gap-3 mt-4">
             <button onclick="nextWord(false)" class="flex-1 bg-white border-2 border-gray-200 text-gray-700 font-bold py-4 rounded-2xl shadow-sm active:bg-gray-50 flex justify-center items-center gap-2 text-lg transition-all">
                 <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> 몰랐어요
             </button>
@@ -109,6 +110,7 @@
         let words = [];
         let currentIndex = 0;
         let isFlipped = false;
+        let isProcessing = false;
 
         window.onload = () => {
             const savedUrl = localStorage.getItem('sheetCsvUrl');
@@ -187,6 +189,7 @@
         }
 
         function toggleCard() {
+            if (isProcessing) return;
             const container = document.querySelector('.card-container');
             isFlipped = !isFlipped;
             if (isFlipped) {
@@ -196,21 +199,24 @@
             }
         }
 
-        // '몰랐어요' 버튼 클릭 시 단어를 먼저 확인(뒤집기) 시킨 뒤 잠시 후 다음 문제로 넘어가도록 수정
         function nextWord(isKnown) {
+            if (isProcessing) return;
+
             const container = document.querySelector('.card-container');
 
-            if (!isKnown && !isFlipped) {
-                // 몰랐어요를 눌렀는데 아직 카드가 앞면(뜻)인 경우 -> 카드를 뒤집어 정답(단어)을 먼저 보여줌
-                isFlipped = true;
-                container.classList.add('flipped');
+            if (!isKnown) {
+                isProcessing = true;
+                
+                if (!isFlipped) {
+                    isFlipped = true;
+                    container.classList.add('flipped');
+                }
 
-                // 1.2초 동안 사용자가 정답 단어를 확인할 수 있게 대기한 후 다음 문제로 진행
                 setTimeout(() => {
                     proceedToNext();
-                }, 1200);
+                    isProcessing = false;
+                }, 1400);
             } else {
-                // 알고 있었거나 이미 카드가 뒤집혀 있는 경우 바로 다음 문제로 진행
                 proceedToNext();
             }
         }
