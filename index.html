@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
-        /* 카드 사이즈가 찌그러지지 않도록 고정 높이와 입체 효과 부여 */
         .card-container { perspective: 1000px; cursor: pointer; -webkit-tap-highlight-color: transparent; height: 380px; flex-shrink: 0; }
         .card-inner { transition: transform 0.4s ease-in-out; transform-style: preserve-3d; width: 100%; height: 100%; position: relative; }
         .card-front, .card-back { backface-visibility: hidden; position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -199,26 +198,32 @@
             }
         }
 
+        // '몰랐어요' / '알고 있었어요' 버튼 공통 처리 함수
         function nextWord(isKnown) {
             if (isProcessing) return;
 
             const container = document.querySelector('.card-container');
+            isProcessing = true;
 
-            if (!isKnown) {
-                isProcessing = true;
-                
-                if (!isFlipped) {
-                    isFlipped = true;
-                    container.classList.add('flipped');
-                }
-
-                setTimeout(() => {
-                    proceedToNext();
-                    isProcessing = false;
-                }, 1400);
-            } else {
-                proceedToNext();
+            // 이미 뒤집혀 있던 상태라면 강제로 앞면으로 리셋 후 애니메이션 재시작
+            if (isFlipped) {
+                isFlipped = false;
+                container.classList.remove('flipped');
             }
+
+            // 아주 짧은 딜레이 후 뒷면(영단어)으로 뒤집기
+            setTimeout(() => {
+                isFlipped = true;
+                container.classList.add('flipped');
+            }, 50);
+
+            // 알고 있었어요는 짧게(0.7초), 몰랐어요는 길게(1.4초) 영단어를 보여준 뒤 다음 문제로 이동
+            const waitTime = isKnown ? 700 : 1400;
+
+            setTimeout(() => {
+                proceedToNext();
+                isProcessing = false;
+            }, waitTime);
         }
 
         function proceedToNext() {
