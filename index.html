@@ -7,15 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
-        .card-container { perspective: 1000px; cursor: pointer; }
-        .card-inner { transition: transform 0.4s ease-in-out; transform-style: preserve-3d; height: 100%; }
-        .card-front, .card-back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .card-container { perspective: 1000px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .card-inner { transition: transform 0.4s ease-in-out; transform-style: preserve-3d; width: 100%; height: 100%; position: relative; }
+        .card-front, .card-back { backface-visibility: hidden; position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .card-back { transform: rotateY(180deg); background-color: #059669; color: white; }
-        .card-front { background-color: white; z-index: 2; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+        .card-front { background-color: white; z-index: 2; }
         .flipped .card-inner { transform: rotateY(180deg); }
+        .no-events { pointer-events: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col text-gray-800">
+<body class="min-h-screen flex flex-col text-gray-800 select-none">
 
     <!-- Header -->
     <header class="bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-10">
@@ -48,23 +49,23 @@
         </div>
 
         <!-- Flashcard -->
-        <div class="flex-1 flex flex-col justify-center mb-6 card-container" onclick="toggleCard()">
-            <div id="cardInner" class="card-inner relative w-full h-80">
+        <div class="flex-1 flex flex-col justify-center mb-6 card-container h-80" onclick="toggleCard()">
+            <div id="cardInner" class="card-inner">
                 
                 <!-- 뜻 (앞면) -->
                 <div class="card-front p-6">
-                    <p class="text-sm font-bold text-gray-400 mb-4 tracking-widest">뜻 (MEANING)</p>
-                    <h2 id="meaningText" class="text-4xl font-extrabold text-gray-800 text-center break-keep leading-tight">로딩 중...</h2>
-                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+                    <p class="text-sm font-bold text-gray-400 mb-4 tracking-widest no-events">뜻 (MEANING)</p>
+                    <h2 id="meaningText" class="text-4xl font-extrabold text-gray-800 text-center break-keep leading-tight no-events">로딩 중...</h2>
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap no-events">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                         화면을 터치해 단어 확인
                     </div>
                 </div>
 
                 <!-- 영단어 (뒷면) -->
-                <div class="card-back p-6 flex flex-col items-center justify-center">
-                    <p class="text-sm font-bold text-emerald-200 mb-4 tracking-widest opacity-80">영단어 (WORD)</p>
-                    <h2 id="wordText" class="text-5xl font-extrabold text-center break-words leading-tight">Word</h2>
+                <div class="card-back p-6">
+                    <p class="text-sm font-bold text-emerald-200 mb-4 tracking-widest opacity-80 no-events">영단어 (WORD)</p>
+                    <h2 id="wordText" class="text-5xl font-extrabold text-center break-words leading-tight no-events">Word</h2>
                 </div>
             </div>
         </div>
@@ -82,23 +83,19 @@
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl" id="settingsModalContent">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
             <h3 class="text-xl font-bold text-gray-900 mb-4">설정 및 연동</h3>
-            
             <div class="bg-blue-50 text-blue-800 text-sm p-4 rounded-xl mb-4 leading-relaxed border border-blue-100">
                 <p class="font-bold mb-1">ℹ️ 구글 시트 연동 방법</p>
-                모바일 환경 최적화를 위해 <b>CSV 링크</b>를 사용합니다.<br><br>
                 1. 구글 시트 메뉴: <b>파일 > 공유 > 웹에 게시</b><br>
                 2. '전체 문서' 옆에 <b>'쉼표로 분리된 값 (.csv)'</b> 선택<br>
                 3. <b>[게시]</b> 버튼 클릭 후 생성된 링크 복사
             </div>
-
             <label class="block text-sm font-bold text-gray-700 mb-2">구글 시트 CSV 링크</label>
-            <input type="text" id="sheetUrlInput" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm mb-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all" placeholder="https://docs.google.com/spreadsheets/d/..../pub?output=csv">
-            
+            <input type="text" id="sheetUrlInput" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm mb-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" placeholder="https://docs.google.com/spreadsheets/d/..../pub?output=csv">
             <div class="flex gap-2">
-                <button onclick="closeSettings()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl active:bg-gray-200 transition-all">취소</button>
-                <button onclick="saveSettings()" class="flex-1 py-3 bg-emerald-600 text-white font-bold rounded-xl active:bg-emerald-700 transition-all">저장 및 연동</button>
+                <button onclick="closeSettings()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl">취소</button>
+                <button onclick="saveSettings()" class="flex-1 py-3 bg-emerald-600 text-white font-bold rounded-xl">저장 및 연동</button>
             </div>
         </div>
     </div>
@@ -162,7 +159,7 @@
                     words = shuffleArray(data);
                     currentIndex = 0;
                     isFlipped = false;
-                    document.getElementById('cardInner').classList.remove('flipped');
+                    document.querySelector('.card-container').classList.remove('flipped');
                     updateUI();
                     setStatus('정상 연동됨', 'text-emerald-600');
                 } else {
@@ -190,16 +187,35 @@
         }
 
         function toggleCard() {
-            const card = document.getElementById('cardInner');
+            const container = document.querySelector('.card-container');
             isFlipped = !isFlipped;
             if (isFlipped) {
-                card.parentElement.classList.add('flipped');
+                container.classList.add('flipped');
             } else {
-                card.parentElement.classList.remove('flipped');
+                container.classList.remove('flipped');
             }
         }
 
+        // '몰랐어요' 버튼 클릭 시 단어를 먼저 확인(뒤집기) 시킨 뒤 잠시 후 다음 문제로 넘어가도록 수정
         function nextWord(isKnown) {
+            const container = document.querySelector('.card-container');
+
+            if (!isKnown && !isFlipped) {
+                // 몰랐어요를 눌렀는데 아직 카드가 앞면(뜻)인 경우 -> 카드를 뒤집어 정답(단어)을 먼저 보여줌
+                isFlipped = true;
+                container.classList.add('flipped');
+
+                // 1.2초 동안 사용자가 정답 단어를 확인할 수 있게 대기한 후 다음 문제로 진행
+                setTimeout(() => {
+                    proceedToNext();
+                }, 1200);
+            } else {
+                // 알고 있었거나 이미 카드가 뒤집혀 있는 경우 바로 다음 문제로 진행
+                proceedToNext();
+            }
+        }
+
+        function proceedToNext() {
             currentIndex++;
             if (currentIndex >= words.length) {
                 alert('모든 단어를 학습했습니다! 순서를 섞어 다시 시작합니다.');
@@ -208,7 +224,7 @@
             }
             
             isFlipped = false;
-            document.getElementById('cardInner').parentElement.classList.remove('flipped');
+            document.querySelector('.card-container').classList.remove('flipped');
             
             setTimeout(() => {
                 updateUI();
