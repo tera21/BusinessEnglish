@@ -18,7 +18,6 @@
 </head>
 <body class="min-h-screen flex flex-col text-gray-800 select-none">
 
-    <!-- Header -->
     <header class="bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-10">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-sm">
@@ -35,7 +34,6 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col justify-between p-4 max-w-lg mx-auto w-full">
         <!-- Progress Bar -->
         <div class="bg-white rounded-2xl p-4 flex justify-between items-center shadow-sm mb-4">
@@ -81,15 +79,13 @@
         </div>
     </main>
 
-    <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
             <h3 class="text-xl font-bold text-gray-900 mb-4">설정 및 연동</h3>
             <div class="bg-blue-50 text-blue-800 text-sm p-4 rounded-xl mb-4 leading-relaxed border border-blue-100">
-                <p class="font-bold mb-1">ℹ️ 구글 시트 연동 방법</p>
-                1. 구글 시트 메뉴: <b>파일 > 공유 > 웹에 게시</b><br>
-                2. '전체 문서' 옆에 <b>'쉼표로 분리된 값 (.csv)'</b> 선택<br>
-                3. <b>[게시]</b> 버튼 클릭 후 생성된 링크 복사
+                <p class="font-bold mb-1">ℹ️ 구글 시트 연동 안내</p>
+                기본 지정된 구글 시트 CSV 주소와 연동됩니다. (A열: 단어, B열: 뜻, C열: 난이도 숫자)<br>
+                필요시 다른 CSV 주소로 변경할 수 있습니다.
             </div>
             <label class="block text-sm font-bold text-gray-700 mb-2">구글 시트 CSV 링크</label>
             <input type="text" id="sheetUrlInput" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm mb-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" placeholder="https://docs.google.com/spreadsheets/d/..../pub?output=csv">
@@ -101,10 +97,7 @@
     </div>
 
     <script>
-        const sampleData = [
-            { word: "proper", meaning: "적당한" },
-            { word: "apple", meaning: "사과" }
-        ];
+        const DEFAULT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-QrIEWFEMVfZmSGMxBAdAuSJgqNlF86iDhWZa2EcdvmSH9I3D75td5a4Ugxh1_oQd_FMdJs-NAm3t/pub?output=csv";
 
         let words = [];
         let currentIndex = 0;
@@ -112,14 +105,12 @@
         let isProcessing = false;
 
         window.onload = () => {
-            const savedUrl = localStorage.getItem('sheetCsvUrl');
-            if (savedUrl) {
-                fetchCSVData(savedUrl);
-            } else {
-                words = shuffleArray([...sampleData]);
-                updateUI();
-                setStatus('연동 안 됨 (샘플)', 'text-gray-500');
+            let savedUrl = localStorage.getItem('sheetCsvUrl');
+            if (!savedUrl) {
+                savedUrl = DEFAULT_CSV_URL;
+                localStorage.setItem('sheetCsvUrl', savedUrl);
             }
+            fetchCSVData(savedUrl);
         };
 
         function parseCSV(text) {
@@ -128,23 +119,51 @@
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
-                const firstCommaIndex = line.indexOf(',');
-                if (firstCommaIndex > -1) {
-                    let w = line.substring(0, firstCommaIndex).trim().replace(/^"|"$/g, '');
-                    let m = line.substring(firstCommaIndex + 1).trim().replace(/^"|"$/g, '');
-                    if (w) result.push({ word: w, meaning: m });
+
+                // CSV 파싱 (쉼표로 구분하되 따옴표 처리 고려)
+                const row = [];
+                let insideQuote = false;
+                let currentItem = '';
+                for (let c = 0; c < line.length; c++) {
+                    let char = line[c];
+                    if (char === '"') {
+                        insideQuote = !insideQuote;
+                    } else if (char === ',' && !insideQuote) {
+                        row.push(currentItem.trim().replace(/^"|"$/g, ''));
+                        currentItem = '';
+                    } else {
+                        currentItem += char;
+                    }
+                }
+                row.push(currentItem.trim().replace(/^"|"$/g, ''));
+
+                const w = row[0] || '';
+                const m = row[1] || '';
+                let diff = Number(row[2]) || 1; // 3번째 열 난이도 (기본값 1)
+                if (diff < 1) diff = 1;
+
+                if (w) {
+                    result.push({ word: w, meaning: m, difficulty: diff });
                 }
             }
             return result;
         }
 
+        // 가중치(Difficulty) 기반 단어 목록 생성 함수
+        // 숫자가 클수록 큐에 더 많이 중복 추가되어 더 자주, 일찍 출제됨
+        function createWeightedQueue(data) {
+            let weightedList = [];
+            data.forEach(item => {
+                let weight = item.difficulty; // 난이도 숫자만큼 반복 추가
+                for (let i = 0; i < weight; i++) {
+                    weightedList.push({ ...item });
+                }
+            });
+            // 전체 리스트를 섞은 뒤 반환
+            return shuffleArray(weightedList);
+        }
+
         async function fetchCSVData(url) {
-            if (!url) {
-                words = shuffleArray([...sampleData]);
-                updateUI();
-                setStatus('연동 안 됨 (샘플)', 'text-gray-500');
-                return;
-            }
             setStatus('불러오는 중...', 'text-blue-500');
             try {
                 const cacheBuster = `&t=${new Date().getTime()}`;
@@ -157,7 +176,7 @@
                 const data = parseCSV(text);
 
                 if (data && data.length > 0) {
-                    words = shuffleArray(data);
+                    words = createWeightedQueue(data);
                     currentIndex = 0;
                     isFlipped = false;
                     document.querySelector('.card-container').classList.remove('flipped');
@@ -168,9 +187,7 @@
                 }
             } catch (error) {
                 console.error('Fetch Error:', error);
-                words = shuffleArray([...sampleData]);
-                updateUI();
-                setStatus('연동 오류 (샘플)', 'text-red-500');
+                setStatus('연동 오류', 'text-red-500');
             }
         }
 
@@ -198,27 +215,21 @@
             }
         }
 
-        // '몰랐어요' / '알고 있었어요' 버튼 공통 처리 함수
         function nextWord(isKnown) {
             if (isProcessing) return;
 
             const container = document.querySelector('.card-container');
             isProcessing = true;
 
-            // 이미 뒤집혀 있던 상태라면 강제로 앞면으로 리셋 후 애니메이션 재시작
-            if (isFlipped) {
-                isFlipped = false;
-                container.classList.remove('flipped');
-            }
+            isFlipped = false;
+            container.classList.remove('flipped');
 
-            // 아주 짧은 딜레이 후 뒷면(영단어)으로 뒤집기
             setTimeout(() => {
                 isFlipped = true;
                 container.classList.add('flipped');
             }, 50);
 
-            // 알고 있었어요는 짧게(0.7초), 몰랐어요는 길게(1.4초) 영단어를 보여준 뒤 다음 문제로 이동
-            const waitTime = isKnown ? 700 : 1400;
+            const waitTime = isKnown ? 600 : 1400;
 
             setTimeout(() => {
                 proceedToNext();
@@ -230,8 +241,9 @@
             currentIndex++;
             if (currentIndex >= words.length) {
                 alert('모든 단어를 학습했습니다! 순서를 섞어 다시 시작합니다.');
-                words = shuffleArray(words);
-                currentIndex = 0;
+                // 다시 불러올 때 원본 데이터를 바탕으로 가중치 큐 재생성
+                fetchCSVData(localStorage.getItem('sheetCsvUrl') || DEFAULT_CSV_URL);
+                return;
             }
             
             isFlipped = false;
@@ -255,7 +267,7 @@
         }
 
         function openSettings() {
-            const savedUrl = localStorage.getItem('sheetCsvUrl') || '';
+            const savedUrl = localStorage.getItem('sheetCsvUrl') || DEFAULT_CSV_URL;
             document.getElementById('sheetUrlInput').value = savedUrl;
             document.getElementById('settingsModal').classList.remove('hidden');
         }
@@ -266,9 +278,13 @@
 
         function saveSettings() {
             const url = document.getElementById('sheetUrlInput').value.trim();
-            localStorage.setItem('sheetCsvUrl', url);
-            closeSettings();
-            fetchCSVData(url);
+            if (url) {
+                localStorage.setItem('sheetCsvUrl', url);
+                closeSettings();
+                fetchCSVData(url);
+            } else {
+                alert('URL을 입력해주세요.');
+            }
         }
 
         function shareLink() {
