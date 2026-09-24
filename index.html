@@ -18,6 +18,7 @@
 </head>
 <body class="min-h-screen flex flex-col text-gray-800 select-none">
 
+    <!-- Header -->
     <header class="bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-10">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-sm">
@@ -34,8 +35,9 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="flex-1 flex flex-col justify-between p-4 max-w-lg mx-auto w-full">
-        <!-- Progress Bar & Round Info -->
+        <!-- Progress Bar -->
         <div class="bg-white rounded-2xl p-4 flex justify-between items-center shadow-sm mb-4">
             <div class="flex items-center gap-2">
                 <span id="roundBadge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded">1라운드</span>
@@ -79,13 +81,14 @@
         </div>
     </main>
 
+    <!-- Settings Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
             <h3 class="text-xl font-bold text-gray-900 mb-4">설정 및 연동</h3>
             <div class="bg-blue-50 text-blue-800 text-sm p-4 rounded-xl mb-4 leading-relaxed border border-blue-100">
                 <p class="font-bold mb-1">ℹ️ 구글 시트 연동 안내</p>
                 A열: 단어, B열: 뜻, C열: 난이도(숫자)<br>
-                필요시 다른 CSV 링크로 변경할 수 있습니다.
+                단어 개수와 문제 개수가 1:1이며, 난이도가 높은 단어가 먼저 출제됩니다.
             </div>
             <label class="block text-sm font-bold text-gray-700 mb-2">구글 시트 CSV 링크</label>
             <input type="text" id="sheetUrlInput" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm mb-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" placeholder="https://docs.google.com/spreadsheets/d/..../pub?output=csv">
@@ -99,9 +102,9 @@
     <script>
         const DEFAULT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-QrIEWFEMVfZmSGMxBAdAuSJgqNlF86iDhWZa2EcdvmSH9I3D75td5a4Ugxh1_oQd_FMdJs-NAm3t/pub?output=csv";
 
-        let masterOriginalData = []; // 원본 전체 데이터 보관용
-        let currentRoundPool = [];   // 현재 라운드에서 아직 못 맞춘 단어들의 원본 풀
-        let words = [];              // 현재 라운드에서 가중치(난이도)가 반영되어 섞인 퀴즈 큐
+        let masterOriginalData = []; 
+        let currentRoundPool = [];   
+        let words = [];              
         let currentIndex = 0;
         let currentRound = 1;
         let isFlipped = false;
@@ -141,8 +144,7 @@
 
                 const w = row[0] || '';
                 const m = row[1] || '';
-                let diff = Number(row[2]) || 1; // 3번째 열 난이도 (기본값 1)
-                if (diff < 1) diff = 1;
+                let diff = Number(row[2]) || 1; 
 
                 if (w) {
                     result.push({ word: w, meaning: m, difficulty: diff });
@@ -151,16 +153,9 @@
             return result;
         }
 
-        // 난이도(difficulty) 가중치 적용하여 출제 큐 생성
-        function createWeightedQueue(dataPool) {
-            let weightedList = [];
-            dataPool.forEach(item => {
-                let weight = item.difficulty;
-                for (let i = 0; i < weight; i++) {
-                    weightedList.push({ ...item });
-                }
-            });
-            return shuffleArray(weightedList);
+        function createSortedQueue(dataPool) {
+            let sorted = [...dataPool].sort((a, b) => b.difficulty - a.difficulty);
+            return sorted;
         }
 
         async function fetchCSVData(url) {
@@ -179,7 +174,7 @@
                     masterOriginalData = data;
                     currentRound = 1;
                     currentRoundPool = [...masterOriginalData];
-                    words = createWeightedQueue(currentRoundPool);
+                    words = createSortedQueue(currentRoundPool);
                     currentIndex = 0;
                     isFlipped = false;
                     document.querySelector('.card-container').classList.remove('flipped');
@@ -203,7 +198,8 @@
         function updateUI() {
             if (words.length === 0) return;
             document.getElementById('roundBadge').innerText = `${currentRound}라운드`;
-            document.getElementById('progressText').innerText = `${currentIndex + 1} / ${words.length} (총 ${currentRoundPool.length}단어)`;
+            // (총 몇단어) 문구 삭제 후 현재 진행도만 표시
+            document.getElementById('progressText').innerText = `${currentIndex + 1} / ${words.length}`;
             document.getElementById('meaningText').innerText = words[currentIndex].meaning;
             document.getElementById('wordText').innerText = words[currentIndex].word;
         }
@@ -225,14 +221,11 @@
             const container = document.querySelector('.card-container');
             isProcessing = true;
 
-            // 알고 맞춘 단어라면 현재 라운드 풀에서 제거 대상 기록
             let currentWordObj = words[currentIndex];
             if (isKnown) {
-                // 현재 라운드 풀에서 해당 단어 제거 (중복 가중치 항목이 여러 개 있을 수 있으므로 동일 단어 모두 제거)
                 currentRoundPool = currentRoundPool.filter(item => item.word !== currentWordObj.word);
             }
 
-            // 카드가 앞면이면 먼저 뒤집어서 정답 보여주기
             isFlipped = false;
             container.classList.remove('flipped');
 
@@ -252,7 +245,6 @@
         function proceedToNext() {
             currentIndex++;
             
-            // 현재 라운드의 큐가 끝났을 때
             if (currentIndex >= words.length) {
                 if (currentRoundPool.length === 0) {
                     alert('🎉 모든 단어를 완벽하게 맞췄습니다! 처음부터 다시 시작합니다.');
@@ -263,8 +255,7 @@
                     alert(`✨ ${currentRound - 1}라운드가 끝났습니다! 맞춘 단어는 제외하고 남은 ${currentRoundPool.length}개의 단어로 ${currentRound}라운드를 시작합니다.`);
                 }
                 
-                // 새로운 라운드 큐 생성
-                words = createWeightedQueue(currentRoundPool);
+                words = createSortedQueue(currentRoundPool);
                 currentIndex = 0;
             }
             
@@ -274,18 +265,6 @@
             setTimeout(() => {
                 updateUI();
             }, 150);
-        }
-
-        function shuffleArray(array) {
-            let curId = array.length;
-            while (0 !== curId) {
-                let randId = Math.floor(Math.random() * curId);
-                curId -= 1;
-                let tmp = array[curId];
-                array[curId] = array[randId];
-                array[randId] = tmp;
-            }
-            return array;
         }
 
         function openSettings() {
