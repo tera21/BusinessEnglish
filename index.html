@@ -1,303 +1,361 @@
-<!DOCTYPE html>
-<html lang="ko">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>모바일 영단어 퀴즈</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
-        .card-container { perspective: 1000px; cursor: pointer; -webkit-tap-highlight-color: transparent; height: 380px; flex-shrink: 0; }
-        .card-inner { transition: transform 0.4s ease-in-out; transform-style: preserve-3d; width: 100%; height: 100%; position: relative; }
-        .card-front, .card-back { backface-visibility: hidden; position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .card-back { transform: rotateY(180deg); background-color: #059669; color: white; }
-        .card-front { background-color: white; z-index: 2; }
-        .flipped .card-inner { transform: rotateY(180deg); }
-        .no-events { pointer-events: none; }
-    </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.7">
+  <style type="text/css">
+    body {background-color: #f0f1f4}
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6d6d6d; -webkit-text-stroke: #6d6d6d}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6b0001; -webkit-text-stroke: #6b0001}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #fb0007; -webkit-text-stroke: #fb0007}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #0000ff; -webkit-text-stroke: #0000ff}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; -webkit-text-stroke: #000000}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #093c94; -webkit-text-stroke: #093c94}
+    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; -webkit-text-stroke: #000000; min-height: 16.0px}
+    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #0f7001; -webkit-text-stroke: #0f7001}
+    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #900112; -webkit-text-stroke: #900112}
+    span.s1 {font-kerning: none; background-color: #fffffe}
+    span.s2 {font-kerning: none; color: #fb0007; background-color: #fffffe; -webkit-text-stroke: 0px #fb0007}
+    span.s3 {font-kerning: none; color: #2a2a2a; background-color: #fffffe; -webkit-text-stroke: 0px #2a2a2a}
+    span.s4 {font-kerning: none; color: #000000; background-color: #fffffe; -webkit-text-stroke: 0px #000000}
+    span.s5 {font-kerning: none; color: #0000ff; background-color: #fffffe; -webkit-text-stroke: 0px #0000ff}
+    span.s6 {font-kerning: none; color: #6b0001; background-color: #fffffe; -webkit-text-stroke: 0px #6b0001}
+    span.s7 {font-kerning: none; color: #900112; background-color: #fffffe; -webkit-text-stroke: 0px #900112}
+    span.s8 {font-kerning: none; color: #137646; background-color: #fffffe; -webkit-text-stroke: 0px #137646}
+    span.s9 {font-kerning: none; color: #093c94; background-color: #fffffe; -webkit-text-stroke: 0px #093c94}
+    span.s10 {font-kerning: none}
+    span.s11 {font-kerning: none; color: #0f7001; background-color: #fffffe; -webkit-text-stroke: 0px #0f7001}
+    span.s12 {font-kerning: none; color: #0e6e6d; background-color: #fffffe; -webkit-text-stroke: 0px #0e6e6d}
+  </style>
 </head>
-<body class="min-h-screen flex flex-col text-gray-800 select-none">
-
-    <header class="bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-10">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-sm">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-            </div>
-            <div>
-                <h1 class="text-lg font-bold text-gray-900 leading-tight">모바일 영단어 퀴즈</h1>
-                <p id="statusText" class="text-xs font-semibold text-gray-500">초기화 중...</p>
-            </div>
-        </div>
-        <div class="flex gap-2">
-            <button onclick="shareLink()" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg></button>
-            <button onclick="openSettings()" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
-        </div>
-    </header>
-
-    <main class="flex-1 flex flex-col justify-between p-4 max-w-lg mx-auto w-full">
-        <!-- Progress Bar -->
-        <div class="bg-white rounded-2xl p-4 flex justify-between items-center shadow-sm mb-4">
-            <div class="flex items-center gap-2">
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded">진행도</span>
-                <span id="progressText" class="font-bold text-gray-800">0 / 0</span>
-            </div>
-            <button onclick="fetchCSVData(localStorage.getItem('sheetCsvUrl'))" class="text-sm font-semibold text-emerald-600 flex items-center gap-1 hover:text-emerald-700">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> 동기화
-            </button>
-        </div>
-
-        <!-- Flashcard -->
-        <div class="card-container my-auto" onclick="toggleCard()">
-            <div id="cardInner" class="card-inner">
-                
-                <!-- 뜻 (앞면) -->
-                <div class="card-front p-6">
-                    <p class="text-sm font-bold text-gray-400 mb-4 tracking-widest no-events">뜻 (MEANING)</p>
-                    <h2 id="meaningText" class="text-4xl font-extrabold text-gray-800 text-center break-keep leading-tight no-events">로딩 중...</h2>
-                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap no-events">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
-                        화면을 터치해 단어 확인
-                    </div>
-                </div>
-
-                <!-- 영단어 (뒷면) -->
-                <div class="card-back p-6">
-                    <p class="text-sm font-bold text-emerald-200 mb-4 tracking-widest opacity-80 no-events">영단어 (WORD)</p>
-                    <h2 id="wordText" class="text-5xl font-extrabold text-center break-words leading-tight no-events">Word</h2>
-                </div>
-            </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex gap-3 mt-4">
-            <button onclick="nextWord(false)" class="flex-1 bg-white border-2 border-gray-200 text-gray-700 font-bold py-4 rounded-2xl shadow-sm active:bg-gray-50 flex justify-center items-center gap-2 text-lg transition-all">
-                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> 몰랐어요
-            </button>
-            <button onclick="nextWord(true)" class="flex-1 bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-sm active:bg-emerald-700 flex justify-center items-center gap-2 text-lg transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 알고 있었어요
-            </button>
-        </div>
-    </main>
-
-    <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">설정 및 연동</h3>
-            <div class="bg-blue-50 text-blue-800 text-sm p-4 rounded-xl mb-4 leading-relaxed border border-blue-100">
-                <p class="font-bold mb-1">ℹ️ 구글 시트 연동 안내</p>
-                기본 지정된 구글 시트 CSV 주소와 연동됩니다. (A열: 단어, B열: 뜻, C열: 난이도 숫자)<br>
-                필요시 다른 CSV 주소로 변경할 수 있습니다.
-            </div>
-            <label class="block text-sm font-bold text-gray-700 mb-2">구글 시트 CSV 링크</label>
-            <input type="text" id="sheetUrlInput" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm mb-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" placeholder="https://docs.google.com/spreadsheets/d/..../pub?output=csv">
-            <div class="flex gap-2">
-                <button onclick="closeSettings()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl">취소</button>
-                <button onclick="saveSettings()" class="flex-1 py-3 bg-emerald-600 text-white font-bold rounded-xl">저장 및 연동</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const DEFAULT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-QrIEWFEMVfZmSGMxBAdAuSJgqNlF86iDhWZa2EcdvmSH9I3D75td5a4Ugxh1_oQd_FMdJs-NAm3t/pub?output=csv";
-
-        let words = [];
-        let currentIndex = 0;
-        let isFlipped = false;
-        let isProcessing = false;
-
-        window.onload = () => {
-            let savedUrl = localStorage.getItem('sheetCsvUrl');
-            if (!savedUrl) {
-                savedUrl = DEFAULT_CSV_URL;
-                localStorage.setItem('sheetCsvUrl', savedUrl);
-            }
-            fetchCSVData(savedUrl);
-        };
-
-        function parseCSV(text) {
-            const lines = text.split('\n');
-            const result = [];
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-
-                // CSV 파싱 (쉼표로 구분하되 따옴표 처리 고려)
-                const row = [];
-                let insideQuote = false;
-                let currentItem = '';
-                for (let c = 0; c < line.length; c++) {
-                    let char = line[c];
-                    if (char === '"') {
-                        insideQuote = !insideQuote;
-                    } else if (char === ',' && !insideQuote) {
-                        row.push(currentItem.trim().replace(/^"|"$/g, ''));
-                        currentItem = '';
-                    } else {
-                        currentItem += char;
-                    }
-                }
-                row.push(currentItem.trim().replace(/^"|"$/g, ''));
-
-                const w = row[0] || '';
-                const m = row[1] || '';
-                let diff = Number(row[2]) || 1; // 3번째 열 난이도 (기본값 1)
-                if (diff < 1) diff = 1;
-
-                if (w) {
-                    result.push({ word: w, meaning: m, difficulty: diff });
-                }
-            }
-            return result;
-        }
-
-        // 가중치(Difficulty) 기반 단어 목록 생성 함수
-        // 숫자가 클수록 큐에 더 많이 중복 추가되어 더 자주, 일찍 출제됨
-        function createWeightedQueue(data) {
-            let weightedList = [];
-            data.forEach(item => {
-                let weight = item.difficulty; // 난이도 숫자만큼 반복 추가
-                for (let i = 0; i < weight; i++) {
-                    weightedList.push({ ...item });
-                }
-            });
-            // 전체 리스트를 섞은 뒤 반환
-            return shuffleArray(weightedList);
-        }
-
-        async function fetchCSVData(url) {
-            setStatus('불러오는 중...', 'text-blue-500');
-            try {
-                const cacheBuster = `&t=${new Date().getTime()}`;
-                const fetchUrl = url.includes('?') ? url + cacheBuster : url + '?' + cacheBuster.substring(1);
-
-                const response = await fetch(fetchUrl);
-                if (!response.ok) throw new Error('네트워크 응답 에러');
-                
-                const text = await response.text();
-                const data = parseCSV(text);
-
-                if (data && data.length > 0) {
-                    words = createWeightedQueue(data);
-                    currentIndex = 0;
-                    isFlipped = false;
-                    document.querySelector('.card-container').classList.remove('flipped');
-                    updateUI();
-                    setStatus('정상 연동됨', 'text-emerald-600');
-                } else {
-                    throw new Error('데이터가 비어있습니다.');
-                }
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                setStatus('연동 오류', 'text-red-500');
-            }
-        }
-
-        function setStatus(text, colorClass) {
-            const statusEl = document.getElementById('statusText');
-            statusEl.innerText = text;
-            statusEl.className = `text-xs font-semibold ${colorClass}`;
-        }
-
-        function updateUI() {
-            if (words.length === 0) return;
-            document.getElementById('progressText').innerText = `${currentIndex + 1} / ${words.length}`;
-            document.getElementById('meaningText').innerText = words[currentIndex].meaning;
-            document.getElementById('wordText').innerText = words[currentIndex].word;
-        }
-
-        function toggleCard() {
-            if (isProcessing) return;
-            const container = document.querySelector('.card-container');
-            isFlipped = !isFlipped;
-            if (isFlipped) {
-                container.classList.add('flipped');
-            } else {
-                container.classList.remove('flipped');
-            }
-        }
-
-        function nextWord(isKnown) {
-            if (isProcessing) return;
-
-            const container = document.querySelector('.card-container');
-            isProcessing = true;
-
-            isFlipped = false;
-            container.classList.remove('flipped');
-
-            setTimeout(() => {
-                isFlipped = true;
-                container.classList.add('flipped');
-            }, 50);
-
-            const waitTime = isKnown ? 600 : 1400;
-
-            setTimeout(() => {
-                proceedToNext();
-                isProcessing = false;
-            }, waitTime);
-        }
-
-        function proceedToNext() {
-            currentIndex++;
-            if (currentIndex >= words.length) {
-                alert('모든 단어를 학습했습니다! 순서를 섞어 다시 시작합니다.');
-                // 다시 불러올 때 원본 데이터를 바탕으로 가중치 큐 재생성
-                fetchCSVData(localStorage.getItem('sheetCsvUrl') || DEFAULT_CSV_URL);
-                return;
-            }
-            
-            isFlipped = false;
-            document.querySelector('.card-container').classList.remove('flipped');
-            
-            setTimeout(() => {
-                updateUI();
-            }, 150);
-        }
-
-        function shuffleArray(array) {
-            let curId = array.length;
-            while (0 !== curId) {
-                let randId = Math.floor(Math.random() * curId);
-                curId -= 1;
-                let tmp = array[curId];
-                array[curId] = array[randId];
-                array[randId] = tmp;
-            }
-            return array;
-        }
-
-        function openSettings() {
-            const savedUrl = localStorage.getItem('sheetCsvUrl') || DEFAULT_CSV_URL;
-            document.getElementById('sheetUrlInput').value = savedUrl;
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
-
-        function saveSettings() {
-            const url = document.getElementById('sheetUrlInput').value.trim();
-            if (url) {
-                localStorage.setItem('sheetCsvUrl', url);
-                closeSettings();
-                fetchCSVData(url);
-            } else {
-                alert('URL을 입력해주세요.');
-            }
-        }
-
-        function shareLink() {
-            if (navigator.share) {
-                navigator.share({
-                    title: '모바일 영단어 퀴즈',
-                    text: '구글 시트 영단어장 모바일 퀴즈',
-                    url: window.location.href,
-                }).catch(console.error);
-            } else {
-                alert('현재 브라우저에서 공유 기능을 지원하지 않습니다.');
-            }
-        }
-    </script>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE</span><span class="s2"> html</span><span class="s1">&gt;</span></p>
+<p class="p2"><span class="s3">&lt;</span><span class="s1">html</span><span class="s4"> </span><span class="s2">lang</span><span class="s3">=</span><span class="s5">"ko"</span><span class="s3">&gt;</span></p>
+<p class="p2"><span class="s3">&lt;</span><span class="s1">head</span><span class="s3">&gt;</span></p>
+<p class="p3"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">meta</span><span class="s4"> </span><span class="s1">charset</span><span class="s3">=</span><span class="s5">"UTF-8"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">meta</span><span class="s4"> </span><span class="s2">name</span><span class="s3">=</span><span class="s1">"viewport"</span><span class="s4"> </span><span class="s2">content</span><span class="s3">=</span><span class="s1">"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">title</span><span class="s3">&gt;</span><span class="s1">모바일 영단어 퀴즈</span><span class="s3">&lt;/</span><span class="s6">title</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">script</span><span class="s4"> </span><span class="s2">src</span><span class="s3">=</span><span class="s1">"https://cdn.tailwindcss.com"</span><span class="s3">&gt;&lt;/</span><span class="s6">script</span><span class="s3">&gt;</span></p>
+<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">style</span><span class="s3">&gt;</span></p>
+<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s6">body</span><span class="s4"> { </span><span class="s2">font-family:</span><span class="s4"> </span><span class="s1">-apple-system</span><span class="s4">, </span><span class="s1">BlinkMacSystemFont</span><span class="s4">, </span><span class="s7">"Segoe UI"</span><span class="s4">, </span><span class="s1">Roboto</span><span class="s4">, </span><span class="s1">Helvetica</span><span class="s4">, </span><span class="s1">Arial</span><span class="s4">, </span><span class="s1">sans-serif</span><span class="s4">; </span><span class="s2">background-color:</span><span class="s4"> </span><span class="s1">#f3f4f6</span><span class="s4">; }</span></p>
+<p class="p3"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s6">.card-container</span><span class="s4"> { </span><span class="s1">perspective:</span><span class="s4"> </span><span class="s8">1000px</span><span class="s4">; </span><span class="s1">cursor:</span><span class="s4"> </span><span class="s9">pointer</span><span class="s4">; </span><span class="s1">-webkit-tap-highlight-color:</span><span class="s4"> </span><span class="s9">transparent</span><span class="s4">; </span><span class="s1">height:</span><span class="s4"> </span><span class="s8">380px</span><span class="s4">; </span><span class="s1">flex-shrink:</span><span class="s4"> </span><span class="s8">0</span><span class="s4">; }</span></p>
+<p class="p3"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s6">.card-inner</span><span class="s4"> { </span><span class="s1">transition:</span><span class="s4"> </span><span class="s9">transform</span><span class="s4"> </span><span class="s8">0.4s</span><span class="s4"> </span><span class="s9">ease-in-out</span><span class="s4">; </span><span class="s1">transform-style:</span><span class="s4"> </span><span class="s9">preserve-3d</span><span class="s4">; </span><span class="s1">width:</span><span class="s4"> </span><span class="s8">100%</span><span class="s4">; </span><span class="s1">height:</span><span class="s4"> </span><span class="s8">100%</span><span class="s4">; </span><span class="s1">position:</span><span class="s4"> </span><span class="s9">relative</span><span class="s4">; }</span></p>
+<p class="p3"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s6">.card-front</span><span class="s4">, </span><span class="s6">.card-back</span><span class="s4"> { </span><span class="s1">backface-visibility:</span><span class="s4"> </span><span class="s9">hidden</span><span class="s4">; </span><span class="s1">position:</span><span class="s4"> </span><span class="s9">absolute</span><span class="s4">; </span><span class="s1">inset:</span><span class="s4"> </span><span class="s8">0</span><span class="s4">; </span><span class="s1">width:</span><span class="s4"> </span><span class="s8">100%</span><span class="s4">; </span><span class="s1">height:</span><span class="s4"> </span><span class="s8">100%</span><span class="s4">; </span><span class="s1">border-radius:</span><span class="s4"> </span><span class="s8">1.5rem</span><span class="s4">; </span><span class="s1">box-shadow:</span><span class="s4"> </span><span class="s8">0</span><span class="s4"> </span><span class="s8">4px</span><span class="s4"> </span><span class="s8">6px</span><span class="s4"> </span><span class="s8">-1px</span><span class="s4"> </span><span class="s9">rgba(</span><span class="s8">0</span><span class="s4">, </span><span class="s8">0</span><span class="s4">, </span><span class="s8">0</span><span class="s4">, </span><span class="s8">0.1</span><span class="s9">)</span><span class="s4">, </span><span class="s8">0</span><span class="s4"> </span><span class="s8">2px</span><span class="s4"> </span><span class="s8">4px</span><span class="s4"> </span><span class="s8">-1px</span><span class="s4"> </span><span class="s9">rgba(</span><span class="s8">0</span><span class="s4">, </span><span class="s8">0</span><span class="s4">, </span><span class="s8">0</span><span class="s4">, </span><span class="s8">0.06</span><span class="s9">)</span><span class="s4">; </span><span class="s1">display:</span><span class="s4"> </span><span class="s9">flex</span><span class="s4">; </span><span class="s1">flex-direction:</span><span class="s4"> </span><span class="s9">column</span><span class="s4">; </span><span class="s1">justify-content:</span><span class="s4"> </span><span class="s9">center</span><span class="s4">; </span><span class="s1">align-items:</span><span class="s4"> </span><span class="s9">center</span><span class="s4">; }</span></p>
+<p class="p3"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s6">.card-back</span><span class="s4"> { </span><span class="s1">transform:</span><span class="s4"> </span><span class="s9">rotateY(</span><span class="s8">180deg</span><span class="s9">)</span><span class="s4">; </span><span class="s1">background-color:</span><span class="s4"> </span><span class="s9">#059669</span><span class="s4">; </span><span class="s1">color:</span><span class="s4"> </span><span class="s9">white</span><span class="s4">; }</span></p>
+<p class="p3"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s6">.card-front</span><span class="s4"> { </span><span class="s1">background-color:</span><span class="s4"> </span><span class="s9">white</span><span class="s4">; </span><span class="s1">z-index:</span><span class="s4"> </span><span class="s8">2</span><span class="s4">; }</span></p>
+<p class="p2"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">.flipped</span><span class="s4"> </span><span class="s1">.card-inner</span><span class="s4"> { </span><span class="s2">transform:</span><span class="s4"> </span><span class="s9">rotateY(</span><span class="s8">180deg</span><span class="s9">)</span><span class="s4">; }</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s6">.no-events</span><span class="s1"> { </span><span class="s2">pointer-events:</span><span class="s1"> </span><span class="s9">none</span><span class="s1">; }</span></p>
+<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">style</span><span class="s3">&gt;</span></p>
+<p class="p2"><span class="s3">&lt;/</span><span class="s1">head</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s3">&lt;</span><span class="s6">body</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"min-h-screen flex flex-col text-gray-800 select-none"</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">header</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-white px-4 py-3 flex items-center justify-between shadow-sm sticky top-0 z-10"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex items-center gap-3"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-sm"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-6 h-6"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">h1</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-lg font-bold text-gray-900 leading-tight"</span><span class="s3">&gt;</span><span class="s4">모바일 영단어 퀴즈</span><span class="s3">&lt;/</span><span class="s6">h1</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"statusText"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xs font-semibold text-gray-500"</span><span class="s3">&gt;</span><span class="s4">초기화 중...</span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex gap-2"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"shareLink()"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"p-2 text-gray-500 hover:bg-gray-100 rounded-full"</span><span class="s3">&gt;&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-6 h-6"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"openSettings()"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"p-2 text-gray-500 hover:bg-gray-100 rounded-full"</span><span class="s3">&gt;&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-6 h-6"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M15 12a3 3 0 11-6 0 3 3 0 016 0z"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">header</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">main</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 flex flex-col justify-between p-4 max-w-lg mx-auto w-full"</span><span class="s3">&gt;</span></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">&lt;!-- Progress Bar &amp; Round Info --&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-white rounded-2xl p-4 flex justify-between items-center shadow-sm mb-4"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex items-center gap-2"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"roundBadge"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded"</span><span class="s3">&gt;</span><span class="s4">1라운드</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"progressText"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"font-bold text-gray-800"</span><span class="s3">&gt;</span><span class="s4">0 / 0</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"fetchCSVData(localStorage.getItem('sheetCsvUrl'))"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-sm font-semibold text-emerald-600 flex items-center gap-1 hover:text-emerald-700"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-4 h-4"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;</span><span class="s4"> 동기화</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">&lt;!-- Flashcard --&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"card-container my-auto"</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"toggleCard()"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"cardInner"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"card-inner"</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s11">&lt;!-- 뜻 (앞면) --&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"card-front p-6"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-sm font-bold text-gray-400 mb-4 tracking-widest no-events"</span><span class="s3">&gt;</span><span class="s4">뜻 (MEANING)</span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">h2</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"meaningText"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-4xl font-extrabold text-gray-800 text-center break-keep leading-tight no-events"</span><span class="s3">&gt;</span><span class="s4">로딩 중...</span><span class="s3">&lt;/</span><span class="s6">h2</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"absolute bottom-6 left-1/2 -translate-x-1/2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap no-events"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                        </span></span><span class="s3">&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-4 h-4"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>화면을 터치해 단어 확인</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">&lt;!-- 영단어 (뒷면) --&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"card-back p-6"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-sm font-bold text-emerald-200 mb-4 tracking-widest opacity-80 no-events"</span><span class="s3">&gt;</span><span class="s4">영단어 (WORD)</span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">h2</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"wordText"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-5xl font-extrabold text-center break-words leading-tight no-events"</span><span class="s3">&gt;</span><span class="s4">Word</span><span class="s3">&lt;/</span><span class="s6">h2</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">&lt;!-- Action Buttons --&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex gap-3 mt-4"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"nextWord(false)"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 bg-white border-2 border-gray-200 text-gray-700 font-bold py-4 rounded-2xl shadow-sm active:bg-gray-50 flex justify-center items-center gap-2 text-lg transition-all"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-5 h-5 text-red-500"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M6 18L18 6M6 6l12 12"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;</span><span class="s4"> 몰랐어요</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"nextWord(true)"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-sm active:bg-emerald-700 flex justify-center items-center gap-2 text-lg transition-all"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">svg</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-5 h-5"</span><span class="s4"> </span><span class="s2">fill</span><span class="s3">=</span><span class="s1">"none"</span><span class="s4"> </span><span class="s2">stroke</span><span class="s3">=</span><span class="s1">"currentColor"</span><span class="s4"> </span><span class="s2">viewBox</span><span class="s3">=</span><span class="s1">"0 0 24 24"</span><span class="s3">&gt;&lt;</span><span class="s6">path</span><span class="s4"> </span><span class="s2">stroke-linecap</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-linejoin</span><span class="s3">=</span><span class="s1">"round"</span><span class="s4"> </span><span class="s2">stroke-width</span><span class="s3">=</span><span class="s1">"2"</span><span class="s4"> </span><span class="s2">d</span><span class="s3">=</span><span class="s1">"M5 13l4 4L19 7"</span><span class="s3">&gt;&lt;/</span><span class="s6">path</span><span class="s3">&gt;&lt;/</span><span class="s6">svg</span><span class="s3">&gt;</span><span class="s4"> 알고 있었어요</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s6">main</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"settingsModal"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">h3</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xl font-bold text-gray-900 mb-4"</span><span class="s3">&gt;</span><span class="s4">설정 및 연동</span><span class="s3">&lt;/</span><span class="s6">h3</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-blue-50 text-blue-800 text-sm p-4 rounded-xl mb-4 leading-relaxed border border-blue-100"</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"font-bold mb-1"</span><span class="s3">&gt;</span><span class="s1">ℹ️ 구글 시트 연동 안내</span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>A열: 단어, B열: 뜻, C열: 난이도(숫자)</span><span class="s3">&lt;</span><span class="s6">br</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>필요시 다른 CSV 링크로 변경할 수 있습니다.</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-bold text-gray-700 mb-2"</span><span class="s3">&gt;</span><span class="s4">구글 시트 CSV 링크</span><span class="s3">&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"text"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"sheetUrlInput"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm mb-6 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"https://docs.google.com/spreadsheets/d/..../pub?output=csv"</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">div</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"flex gap-2"</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"closeSettings()"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl"</span><span class="s3">&gt;</span><span class="s4">취소</span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"saveSettings()"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"flex-1 py-3 bg-emerald-600 text-white font-bold rounded-xl"</span><span class="s3">&gt;</span><span class="s4">저장 및 연동</span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">script</span><span class="s3">&gt;</span></p>
+<p class="p9"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s5">const</span><span class="s4"> </span><span class="s12">DEFAULT_CSV_URL</span><span class="s4"> = </span><span class="s1">"https://docs.google.com/spreadsheets/d/e/2PACX-1vS-QrIEWFEMVfZmSGMxBAdAuSJgqNlF86iDhWZa2EcdvmSH9I3D75td5a4Ugxh1_oQd_FMdJs-NAm3t/pub?output=csv"</span><span class="s4">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> masterOriginalData = []; </span><span class="s11">// 원본 전체 데이터 보관용</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> currentRoundPool = []; <span class="Apple-converted-space">  </span></span><span class="s11">// 현재 라운드에서 아직 못 맞춘 단어들의 원본 풀</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> words = [];<span class="Apple-converted-space">              </span></span><span class="s11">// 현재 라운드에서 가중치(난이도)가 반영되어 섞인 퀴즈 큐</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> currentIndex = </span><span class="s8">0</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> currentRound = </span><span class="s8">1</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> isFlipped = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">let</span><span class="s1"> isProcessing = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>window.onload = () =&gt; {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">let</span><span class="s1"> savedUrl = localStorage.getItem(</span><span class="s7">'sheetCsvUrl'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (!savedUrl) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>savedUrl = </span><span class="s12">DEFAULT_CSV_URL</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>localStorage.setItem(</span><span class="s7">'sheetCsvUrl'</span><span class="s1">, savedUrl);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>fetchCSVData(savedUrl);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> parseCSV(text) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> lines = text.split(</span><span class="s7">'\n'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> result = [];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">for</span><span class="s1"> (</span><span class="s5">let</span><span class="s1"> i = </span><span class="s8">1</span><span class="s1">; i &lt; lines.length; i++) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> line = lines[i].trim();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (!line) </span><span class="s5">continue</span><span class="s1">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> row = [];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> insideQuote = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> currentItem = </span><span class="s7">''</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">for</span><span class="s1"> (</span><span class="s5">let</span><span class="s1"> c = </span><span class="s8">0</span><span class="s1">; c &lt; line.length; c++) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s5">let</span><span class="s1"> char = line[c];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s5">if</span><span class="s1"> (char === </span><span class="s7">'"'</span><span class="s1">) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>insideQuote = !insideQuote;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>} </span><span class="s5">else</span><span class="s1"> </span><span class="s5">if</span><span class="s1"> (char === </span><span class="s7">','</span><span class="s1"> &amp;&amp; !insideQuote) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>row.push(currentItem.trim().replace(</span><span class="s6">/^"|"$/</span><span class="s5">g</span><span class="s1">, </span><span class="s7">''</span><span class="s1">));</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>currentItem = </span><span class="s7">''</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                        </span>currentItem += char;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>row.push(currentItem.trim().replace(</span><span class="s6">/^"|"$/</span><span class="s5">g</span><span class="s1">, </span><span class="s7">''</span><span class="s1">));</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> w = row[</span><span class="s8">0</span><span class="s1">] || </span><span class="s7">''</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> m = row[</span><span class="s8">1</span><span class="s1">] || </span><span class="s7">''</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> diff = </span><span class="s12">Number</span><span class="s1">(row[</span><span class="s8">2</span><span class="s1">]) || </span><span class="s8">1</span><span class="s1">; </span><span class="s11">// 3번째 열 난이도 (기본값 1)</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (diff &lt; </span><span class="s8">1</span><span class="s1">) diff = </span><span class="s8">1</span><span class="s1">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (w) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>result.push({ word: w, meaning: m, difficulty: diff });</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">return</span><span class="s1"> result;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// 난이도(difficulty) 가중치 적용하여 출제 큐 생성</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> createWeightedQueue(dataPool) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">let</span><span class="s1"> weightedList = [];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>dataPool.forEach(item =&gt; {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> weight = item.difficulty;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">for</span><span class="s1"> (</span><span class="s5">let</span><span class="s1"> i = </span><span class="s8">0</span><span class="s1">; i &lt; weight; i++) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>weightedList.push({ ...item });</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">return</span><span class="s1"> shuffleArray(weightedList);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">async</span><span class="s1"> </span><span class="s5">function</span><span class="s1"> fetchCSVData(url) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>setStatus(</span><span class="s7">'불러오는 중...'</span><span class="s1">, </span><span class="s7">'text-blue-500'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">try</span><span class="s1"> {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> cacheBuster = </span><span class="s7">`&amp;t=</span><span class="s1">${</span><span class="s5">new</span><span class="s1"> </span><span class="s12">Date</span><span class="s1">().getTime()}</span><span class="s7">`</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> fetchUrl = url.includes(</span><span class="s7">'?'</span><span class="s1">) ? url + cacheBuster : url + </span><span class="s7">'?'</span><span class="s1"> + cacheBuster.substring(</span><span class="s8">1</span><span class="s1">);</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> response = </span><span class="s5">await</span><span class="s1"> fetch(fetchUrl);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (!response.ok) </span><span class="s5">throw</span><span class="s1"> </span><span class="s5">new</span><span class="s1"> </span><span class="s12">Error</span><span class="s1">(</span><span class="s7">'네트워크 응답 에러'</span><span class="s1">);</span></p>
+<p class="p7"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> text = </span><span class="s5">await</span><span class="s1"> response.text();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">const</span><span class="s1"> data = parseCSV(text);</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (data &amp;&amp; data.length &gt; </span><span class="s8">0</span><span class="s1">) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>masterOriginalData = data;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>currentRound = </span><span class="s8">1</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>currentRoundPool = [...masterOriginalData];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>words = createWeightedQueue(currentRoundPool);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>currentIndex = </span><span class="s8">0</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>isFlipped = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>document.querySelector(</span><span class="s7">'.card-container'</span><span class="s1">).classList.remove(</span><span class="s7">'flipped'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>updateUI();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>setStatus(</span><span class="s7">'정상 연동됨'</span><span class="s1">, </span><span class="s7">'text-emerald-600'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s5">throw</span><span class="s1"> </span><span class="s5">new</span><span class="s1"> </span><span class="s12">Error</span><span class="s1">(</span><span class="s7">'데이터가 비어있습니다.'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">catch</span><span class="s1"> (error) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>console.error(</span><span class="s7">'Fetch Error:'</span><span class="s1">, error);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>setStatus(</span><span class="s7">'연동 오류'</span><span class="s1">, </span><span class="s7">'text-red-500'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> setStatus(text, colorClass) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> statusEl = document.getElementById(</span><span class="s7">'statusText'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>statusEl.innerText = text;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>statusEl.className = </span><span class="s7">`text-xs font-semibold </span><span class="s1">${colorClass}</span><span class="s7">`</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> updateUI() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (words.length === </span><span class="s8">0</span><span class="s1">) </span><span class="s5">return</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'roundBadge'</span><span class="s1">).innerText = </span><span class="s7">`</span><span class="s1">${currentRound}</span><span class="s7">라운드`</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'progressText'</span><span class="s1">).innerText = </span><span class="s7">`</span><span class="s1">${currentIndex + </span><span class="s8">1</span><span class="s1">}</span><span class="s7"> / </span><span class="s1">${words.length}</span><span class="s7"> (총 </span><span class="s1">${currentRoundPool.length}</span><span class="s7">단어)`</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'meaningText'</span><span class="s1">).innerText = words[currentIndex].meaning;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'wordText'</span><span class="s1">).innerText = words[currentIndex].word;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> toggleCard() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (isProcessing) </span><span class="s5">return</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> container = document.querySelector(</span><span class="s7">'.card-container'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>isFlipped = !isFlipped;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (isFlipped) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>container.classList.add(</span><span class="s7">'flipped'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>container.classList.remove(</span><span class="s7">'flipped'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> nextWord(isKnown) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (isProcessing) </span><span class="s5">return</span><span class="s1">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> container = document.querySelector(</span><span class="s7">'.card-container'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>isProcessing = </span><span class="s5">true</span><span class="s1">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// 알고 맞춘 단어라면 현재 라운드 풀에서 제거 대상 기록</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">let</span><span class="s1"> currentWordObj = words[currentIndex];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (isKnown) {</span></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// 현재 라운드 풀에서 해당 단어 제거 (중복 가중치 항목이 여러 개 있을 수 있으므로 동일 단어 모두 제거)</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>currentRoundPool = currentRoundPool.filter(item =&gt; item.word !== currentWordObj.word);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// 카드가 앞면이면 먼저 뒤집어서 정답 보여주기</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>isFlipped = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>container.classList.remove(</span><span class="s7">'flipped'</span><span class="s1">);</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>isFlipped = </span><span class="s5">true</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>container.classList.add(</span><span class="s7">'flipped'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}, </span><span class="s8">50</span><span class="s1">);</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> waitTime = isKnown ? </span><span class="s8">700</span><span class="s1"> : </span><span class="s8">1400</span><span class="s1">;</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>proceedToNext();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>isProcessing = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}, waitTime);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> proceedToNext() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>currentIndex++;</span></p>
+<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p8"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// 현재 라운드의 큐가 끝났을 때</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (currentIndex &gt;= words.length) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">if</span><span class="s1"> (currentRoundPool.length === </span><span class="s8">0</span><span class="s1">) {</span></p>
+<p class="p9"><span class="s4"><span class="Apple-converted-space">                    </span>alert(</span><span class="s1">'🎉 모든 단어를 완벽하게 맞췄습니다! 처음부터 다시 시작합니다.'</span><span class="s4">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>currentRound = </span><span class="s8">1</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>currentRoundPool = [...masterOriginalData];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>currentRound++;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>alert(</span><span class="s7">`✨ </span><span class="s1">${currentRound - </span><span class="s8">1</span><span class="s1">}</span><span class="s7">라운드가 끝났습니다! 맞춘 단어는 제외하고 남은 </span><span class="s1">${currentRoundPool.length}</span><span class="s7">개의 단어로 </span><span class="s1">${currentRound}</span><span class="s7">라운드를 시작합니다.`</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
+<p class="p7"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s11">// 새로운 라운드 큐 생성</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>words = createWeightedQueue(currentRoundPool);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>currentIndex = </span><span class="s8">0</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>isFlipped = </span><span class="s5">false</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.querySelector(</span><span class="s7">'.card-container'</span><span class="s1">).classList.remove(</span><span class="s7">'flipped'</span><span class="s1">);</span></p>
+<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>updateUI();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}, </span><span class="s8">150</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> shuffleArray(array) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">let</span><span class="s1"> curId = array.length;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">while</span><span class="s1"> (</span><span class="s8">0</span><span class="s1"> !== curId) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> randId = </span><span class="s12">Math</span><span class="s1">.floor(</span><span class="s12">Math</span><span class="s1">.random() * curId);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>curId -= </span><span class="s8">1</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s5">let</span><span class="s1"> tmp = array[curId];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>array[curId] = array[randId];</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>array[randId] = tmp;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">return</span><span class="s1"> array;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> openSettings() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> savedUrl = localStorage.getItem(</span><span class="s7">'sheetCsvUrl'</span><span class="s1">) || </span><span class="s12">DEFAULT_CSV_URL</span><span class="s1">;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'sheetUrlInput'</span><span class="s1">).value = savedUrl;</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'settingsModal'</span><span class="s1">).classList.remove(</span><span class="s7">'hidden'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> closeSettings() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById(</span><span class="s7">'settingsModal'</span><span class="s1">).classList.add(</span><span class="s7">'hidden'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> saveSettings() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">const</span><span class="s1"> url = document.getElementById(</span><span class="s7">'sheetUrlInput'</span><span class="s1">).value.trim();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (url) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>localStorage.setItem(</span><span class="s7">'sheetCsvUrl'</span><span class="s1">, url);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>closeSettings();</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>fetchCSVData(url);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>alert(</span><span class="s7">'URL을 입력해주세요.'</span><span class="s1">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p7"><span class="s10"></span><br></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s5">function</span><span class="s1"> shareLink() {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s5">if</span><span class="s1"> (navigator.share) {</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>navigator.share({</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>title: </span><span class="s7">'모바일 영단어 퀴즈'</span><span class="s1">,</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>text: </span><span class="s7">'구글 시트 영단어장 모바일 퀴즈'</span><span class="s1">,</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>url: window.location.href,</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>}).</span><span class="s5">catch</span><span class="s1">(console.error);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s5">else</span><span class="s1"> {</span></p>
+<p class="p9"><span class="s4"><span class="Apple-converted-space">                </span>alert(</span><span class="s1">'현재 브라우저에서 공유 기능을 지원하지 않습니다.'</span><span class="s4">);</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">script</span><span class="s3">&gt;</span></p>
+<p class="p2"><span class="s3">&lt;/</span><span class="s1">body</span><span class="s3">&gt;</span></p>
+<p class="p2"><span class="s3">&lt;/</span><span class="s1">html</span><span class="s3">&gt;</span></p>
 </body>
 </html>
